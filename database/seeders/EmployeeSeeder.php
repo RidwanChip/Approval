@@ -19,7 +19,7 @@ class EmployeeSeeder extends Seeder
     {
         // Create Admin User
         $adminUser = User::create([
-            'name' => 'Admin Pabrik',
+            'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
         ]);
@@ -33,39 +33,39 @@ class EmployeeSeeder extends Seeder
         $adminUser->assignRole('Admin');
 
         // Create Sample Employees
-        $employees = [
-            [
-                'user' => [
-                    'name' => 'Budi Santoso',
-                    'email' => 'budi@example.com',
-                    'password' => Hash::make('password'),
-                ],
-                'department_id' => Department::where('name', 'Produksi')->first()->id,
-                'contact' => '081234567891',
-                'role' => 'Supervisor'
-            ],
-            [
-                'user' => [
-                    'name' => 'Ani Wijaya',
-                    'email' => 'ani@example.com',
-                    'password' => Hash::make('password'),
-                ],
-                'department_id' => Department::where('name', 'Produksi')->first()->id,
-                'contact' => '081234567892',
-                'role' => 'Operator Mesin'
-            ]
-        ];
+        // $employees = [
+        //     [
+        //         'user' => [
+        //             'name' => 'Budi Santoso',
+        //             'email' => 'budi@example.com',
+        //             'password' => Hash::make('password'),
+        //         ],
+        //         'department_id' => Department::where('name', 'Produksi')->first()->id,
+        //         'contact' => '081234567891',
+        //         'role' => 'Supervisor'
+        //     ],
+        //     [
+        //         'user' => [
+        //             'name' => 'Ani Wijaya',
+        //             'email' => 'ani@example.com',
+        //             'password' => Hash::make('password'),
+        //         ],
+        //         'department_id' => Department::where('name', 'Produksi')->first()->id,
+        //         'contact' => '081234567892',
+        //         'role' => 'Operator Mesin'
+        //     ]
+        // ];
 
-        foreach ($employees as $employeeData) {
-            $user = User::create($employeeData['user']);
-            $employee = Employee::create(array_merge(
-                collect($employeeData)->except(['user', 'role'])->toArray(),
-                ['user_id' => $user->id]
-            ));
-            $user->assignRole($employeeData['role']);
-        }
+        // foreach ($employees as $employeeData) {
+        //     $user = User::create($employeeData['user']);
+        //     $employee = Employee::create(array_merge(
+        //         collect($employeeData)->except(['user', 'role'])->toArray(),
+        //         ['user_id' => $user->id]
+        //     ));
+        //     $user->assignRole($employeeData['role']);
+        // }
 
         // Generate random employees
-        Employee::factory()->count(5)->create();
+        // Employee::factory()->count(5)->create();
     }
 }

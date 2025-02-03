@@ -48,8 +48,27 @@ class User extends Authenticatable
         ];
     }
 
+    // Create relation to Employee
     public function employee(): HasOne
     {
         return $this->hasOne(Employee::class);
+    }
+
+    // Action related user canApprove
+    public function canApprove(ApprovalRequest $request): bool
+    {
+        if (!$request->flow) {
+            return false; // Jika tidak ada flow, tidak bisa approve
+        }
+
+        $currentStep = $request->flow->steps()
+            ->where('level', $request->current_level)
+            ->first();
+
+        if (!$currentStep) {
+            return false; // Jika tidak ada step, tidak bisa approve
+        }
+
+        return $currentStep && $currentStep->user_id === $this->id;
     }
 }

@@ -29,6 +29,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Employees';
 
+    protected static ?string $label = 'Employee';
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
