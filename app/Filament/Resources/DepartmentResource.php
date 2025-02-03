@@ -49,8 +49,7 @@ class DepartmentResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('description')
-                    ->searchable(),
+                TextColumn::make('description'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -70,7 +69,9 @@ class DepartmentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultPaginationPageOption(10)
+            ->paginated([10, 25, 50]);
     }
 
     public static function getRelations(): array

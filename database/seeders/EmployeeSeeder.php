@@ -20,7 +20,7 @@ class EmployeeSeeder extends Seeder
         // Create Admin User
         $adminUser = User::create([
             'name' => 'Admin Pabrik',
-            'email' => 'admin@pabrik.com',
+            'email' => 'admin@example.com',
             'password' => Hash::make('password'),
         ]);
 
@@ -37,7 +37,7 @@ class EmployeeSeeder extends Seeder
             [
                 'user' => [
                     'name' => 'Budi Santoso',
-                    'email' => 'budi@pabrik.com',
+                    'email' => 'budi@example.com',
                     'password' => Hash::make('password'),
                 ],
                 'department_id' => Department::where('name', 'Produksi')->first()->id,
@@ -47,7 +47,7 @@ class EmployeeSeeder extends Seeder
             [
                 'user' => [
                     'name' => 'Ani Wijaya',
-                    'email' => 'ani@pabrik.com',
+                    'email' => 'ani@example.com',
                     'password' => Hash::make('password'),
                 ],
                 'department_id' => Department::where('name', 'Produksi')->first()->id,
@@ -58,7 +58,7 @@ class EmployeeSeeder extends Seeder
 
         foreach ($employees as $employeeData) {
             $user = User::create($employeeData['user']);
-            $employees = Employee::create(array_merge(
+            $employee = Employee::create(array_merge(
                 collect($employeeData)->except(['user', 'role'])->toArray(),
                 ['user_id' => $user->id]
             ));
@@ -66,6 +66,6 @@ class EmployeeSeeder extends Seeder
         }
 
         // Generate random employees
-        // Employee::factory()->count(5)->create();
+        Employee::factory()->count(5)->create();
     }
 }

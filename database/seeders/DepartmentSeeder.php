@@ -23,5 +23,7 @@ class DepartmentSeeder extends Seeder
         foreach ($departments as $department) {
             Department::create($department);
         }
+
+        Department::factory()->count(15)->create();
     }
 }

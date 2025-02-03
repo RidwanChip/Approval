@@ -60,7 +60,11 @@ class UserResource extends Resource
                             ->maxLength(255),
                         Select::make('roles')
                             ->multiple()
-                            ->required()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255)
+                            ])
                             ->relationship(titleAttribute: 'name')->preload(),
                     ]),
                 Section::make('Employee Details')
@@ -68,14 +72,24 @@ class UserResource extends Resource
                     ->schema([
                         Select::make('department_id')
                             ->relationship('department', 'name')
-                            ->required(),
+                            ->preload()
+                            ->searchable()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->maxLength(255)
+                                    ->minLength(2)
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->maxLength(255)
+                                    ->minLength(2),
+                            ])->required(),
                         TextInput::make('contact')
                             ->label('Phone Number')
                             ->placeholder('Enter a phone number')
                             ->required()
                             ->numeric()
                             ->maxLength(255),
-                    ])
+                    ]),
             ]);
     }
 
@@ -118,7 +132,9 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultPaginationPageOption(10)
+            ->paginated([10, 25, 50]);;
     }
 
     public static function getRelations(): array
