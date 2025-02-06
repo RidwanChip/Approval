@@ -22,7 +22,7 @@ class DepartmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'User Settings';
     protected static ?int $navigationSort = 3;
     public static function getNavigationBadge(): ?string
     {

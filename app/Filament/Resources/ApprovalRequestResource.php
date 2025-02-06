@@ -226,12 +226,10 @@ class ApprovalRequestResource extends Resource
                         'rejected' => 'Rejected',
                     ])
                     ->label('Status'),
-                SelectFilter::make('user.name')
-                    ->relationship('user', 'name', function (Builder $query) {
-                        $query->whereHas('roles', function (Builder $roleQuery) {
-                            $roleQuery->where('name', 'Admin'); // Filter berdasarkan role Admin
-                        });
-                    })
+                SelectFilter::make('logs.user_id')
+                    ->relationship('logs.user', 'name')
+                    ->searchable()
+                    ->preload()
                     ->label('Approver'),
                 Filter::make('created_at')
                     ->indicator('Date Range')
@@ -314,6 +312,7 @@ class ApprovalRequestResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     BulkAction::make('exportPDF')
                         ->label('Download PDF')
+                        ->icon('heroicon-o-folder-arrow-down')
                         ->openUrlInNewTab()
                         ->action(fn(Collection $records) => redirect()->away(
                             URL::signedRoute('report.approval', [

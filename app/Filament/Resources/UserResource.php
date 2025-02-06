@@ -25,15 +25,24 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'User Settings';
 
-    protected static ?string $navigationLabel = 'Employees';
+    // protected static ?string $navigationLabel = 'Employees';
 
-    protected static ?string $label = 'Employee';
+    public static function getNavigationLabel(): string
+    {
+        return __(auth()->user()->hasRole('Admin') ? 'Employees' : 'Profile');
+    }
+
+    public static function getLabel(): string
+    {
+        return __(auth()->user()->hasRole('Admin') ? 'Employees' : 'Profile');
+    }
+    // protected static ?string $label = 'Employee';
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return auth()->user()->hasRole('Admin') ? static::getModel()::count() : null;
     }
 
 
@@ -52,7 +61,7 @@ class UserResource extends Resource
                             ->email()
                             ->required()
                             ->maxLength(255),
-                        DateTimePicker::make('email_verified_at'),
+                        DateTimePicker::make('email_verified_at')->disabled(fn() => !auth()->user()->hasRole('Admin')),
                         TextInput::make('password')
                             ->password()
                             ->revealable()
@@ -67,7 +76,9 @@ class UserResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                             ])
-                            ->relationship(titleAttribute: 'name')->preload(),
+                            ->relationship(titleAttribute: 'name')
+                            ->preload()
+                            ->disabled(fn() => !auth()->user()->hasRole('Admin')),
                     ]),
                 Section::make('Employee Details')
                     ->relationship('employee')
@@ -84,7 +95,7 @@ class UserResource extends Resource
                                 TextInput::make('description')
                                     ->maxLength(255)
                                     ->minLength(2),
-                            ])->required(),
+                            ])->required()->disabled(fn() => !auth()->user()->hasRole('Admin')),
                         TextInput::make('contact')
                             ->label('Phone Number')
                             ->placeholder('Enter a phone number')
@@ -144,6 +155,14 @@ class UserResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(!auth()->user()->hasRole('Admin'), function ($query) {
+                return $query->where('id', auth()->id());
+            });
     }
 
     public static function getPages(): array
