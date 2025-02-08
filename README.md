@@ -31,6 +31,9 @@ cp .env.example .env
 ```
 Edit file `.env` dan sesuaikan dengan konfigurasi database:
 ```
+APP_URL=http://127.0.0.1:8000 (Sesuaikan IP Local dan Port)
+
+--Sesuaikan Konfigurasi Database
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -43,6 +46,7 @@ DB_PASSWORD=
 ```sh
 php artisan key:generate
 php artisan migrate --seed
+php artisan storage:link
 ```
 
 ### 5. Jalankan Server
