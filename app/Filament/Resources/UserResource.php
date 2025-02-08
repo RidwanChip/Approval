@@ -13,6 +13,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use App\Filament\Resources\UserResource\Pages;
@@ -49,6 +51,11 @@ class UserResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns([
+                'sm' => 2,
+                'md' => 2,
+                'xl' => 3,
+            ])
             ->schema([
                 Section::make('User Information')
                     ->schema([
@@ -78,7 +85,22 @@ class UserResource extends Resource
                             ])
                             ->relationship(titleAttribute: 'name')
                             ->preload()
-                            ->disabled(fn() => !auth()->user()->hasRole('Admin')),
+                            ->hidden(fn() => !auth()->user()->hasRole('Admin'))
+                            ->columnSpan([
+                                'xl' => 2,
+                            ]),
+                        FileUpload::make('signature_image')
+                            ->label('Tanda Tangan')
+                            ->disk('public') // Tentukan disk untuk penyimpanan (gunakan public disk)
+                            ->directory('signatures') // Direktori untuk menyimpan gambar tanda tangan
+                            ->image() // Validasi file yang di-upload hanya gambar
+                            ->nullable() // Bisa kosong
+                            ->maxSize(1024)->columnSpan([
+                                'sm' => 2,
+                                'md' => 2,
+                                'xl' => 3,
+                            ])
+
                     ]),
                 Section::make('Employee Details')
                     ->relationship('employee')
@@ -103,6 +125,7 @@ class UserResource extends Resource
                             ->numeric()
                             ->maxLength(255),
                     ]),
+
             ]);
     }
 
@@ -113,13 +136,16 @@ class UserResource extends Resource
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('roles.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() => !auth()->user()->hasRole('Admin')),
                 TextColumn::make('employee.department.name')
                     ->label('Department')
                     ->searchable(),
                 TextColumn::make('employee.contact')
                     ->label('Phone Number')
                     ->searchable(),
+                ImageColumn::make('signature_image')
+                    ->label('Tanda Tangan'),
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('email_verified_at')
@@ -134,6 +160,7 @@ class UserResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //

@@ -25,6 +25,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ApprovalRequestResource\Pages;
 use App\Filament\Resources\ApprovalRequestResource\RelationManagers;
+use Filament\Support\Enums\FontWeight;
 
 class ApprovalRequestResource extends Resource
 {
@@ -64,10 +66,55 @@ class ApprovalRequestResource extends Resource
                     ->native(false)
                     ->searchable()
                     ->preload()
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->required()
+                            ->label('Approval Name'),
+                        Hidden::make('user_id')
+                            ->default(auth()->id()),
+                        Repeater::make('steps')
+                            ->relationship()
+                            ->required()
+                            ->schema([
+                                Select::make('user_id')
+                                    ->label('Approver')
+                                    ->options(User::all()->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->columnStart(1),
+
+                                TextInput::make('level')
+                                    ->hidden()
+                                    ->label('Urutan')
+                                    ->numeric()
+                                    ->required()
+                                    ->minValue(1)
+                                    ->default(function ($state, $get, $set) {
+                                        // Hitung jumlah step yang sudah ada
+                                        $steps = $get('../../steps') ?? [];
+                                        return count($steps) + 1;
+                                    })
+                                    ->columnStart(1)
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull()
+                            ->addActionLabel('Add Another Approver')
+                            ->defaultItems(1)
+                            ->reorderableWithButtons()
+                            ->orderColumn('level')
+                            ->label('List Approver')
+                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                // Pastikan level diisi
+                                $data['level'] = $data['level'] ?? 1;
+                                return $data;
+                            })
+                    ])
                     ->getOptionLabelUsing(
                         fn($value) => ApprovalFlow::find($value)?->name ?? $value
                     )
-                    ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
+                    ->disabledOn('edit'),
+                // ->disabled(fn($record) => $record && 'edit' && $record->user_id !== auth()->id()),
                 // ->disabled(fn($record) => $record && auth()->user()->canApprove($record)),
                 TextInput::make('data')
                     ->required()
@@ -126,6 +173,7 @@ class ApprovalRequestResource extends Resource
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Name')
+                    ->weight(FontWeight::Bold)
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
@@ -167,7 +215,7 @@ class ApprovalRequestResource extends Resource
                     ->icon(fn(string $state): string => match ($state) {
                         'pending' => 'heroicon-o-clock',
                         'onHold' => 'heroicon-o-exclamation-circle',
-                        'approved' => 'heroicon-o-check-circle',
+                        'approved' => 'heroicon-o-check-badge',
                         'rejected' => 'heroicon-o-x-circle',
                         default => 'heroicon-o-question-mark-circle',
                     })
@@ -177,7 +225,7 @@ class ApprovalRequestResource extends Resource
                     ->label('Step')
                     ->formatStateUsing(
                         fn($state, $record) =>
-                        $record->status === 'approved' ?  "{$state} - " . 'Completed' : ($record->status === 'rejected' ?  "{$state} - " . 'Rejected' : "Step {$state}/" . $record->flow->steps->count())
+                        $record->status === 'approved' ?  "{$state} : " . 'Completed' : ($record->status === 'rejected' ?  "{$state} : " . 'Rejected' : "Step {$state}/" . $record->flow->steps->count())
                     )
                     ->badge()
                     ->color(
@@ -194,7 +242,7 @@ class ApprovalRequestResource extends Resource
                             ->unique()
                             ->join(', ');
 
-                        return $approvers ?: 'There is no approval yet';
+                        return $approvers ?: '-';
                     })
                     ->html()
                     ->tooltip('People who have reviewed')
@@ -268,44 +316,51 @@ class ApprovalRequestResource extends Resource
             ], layout: FiltersLayout::AboveContentCollapsible)
 
             ->actions([
-                Action::make('approve')
-                    ->color('success')
-                    ->form([
-                        Textarea::make('notes')
-                            ->label('Approval Note')
-                            ->placeholder('Add Note (opsional)')
-                    ])
-                    ->action(function (ApprovalRequest $record, array $data) {
-                        $record->approve($data['notes'] ?? '');
-                    })
-                    ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
+                ActionGroup::make([
+                    Action::make('approve')
+                        ->label('Approve')
+                        ->color('success')
+                        ->icon('heroicon-o-check-circle')
+                        ->form([
+                            Textarea::make('notes')
+                                ->label('Approval Note')
+                                ->placeholder('Add Note (opsional)')
+                        ])
+                        ->action(function (ApprovalRequest $record, array $data) {
+                            $record->approve($data['notes'] ?? '');
+                        })
+                        ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
 
-                Action::make('onHold')
-                    ->color('warning')
-                    ->form([
-                        Textarea::make('notes')
-                            ->label('onHold Note')
-                            ->placeholder('onHold Message')
-                            ->required()
-                    ])
-                    ->action(function (ApprovalRequest $record, array $data) {
-                        $record->onHold($data['notes']);
-                    })
-                    ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
-
-                Action::make('reject')
-                    ->color('danger')
-                    ->form([
-                        Textarea::make('notes')
-                            ->label('Rejection Note')
-                            ->placeholder('Rejection Message')
-                            ->required() // Bisa dibuat required untuk penolakan
-                    ])
-                    ->action(function (ApprovalRequest $record, array $data) {
-                        $record->reject($data['notes']);
-                    })
-                    ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
+                    Action::make('onHold')
+                        ->label('Hold')
+                        ->color('warning')
+                        ->icon('heroicon-o-clock')
+                        ->form([
+                            Textarea::make('notes')
+                                ->label('Hold Note')
+                                ->placeholder('Hold Message')
+                                ->required()
+                        ])
+                        ->action(function (ApprovalRequest $record, array $data) {
+                            $record->onHold($data['notes']);
+                        })
+                        ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
+                    Action::make('reject')
+                        ->color('danger')
+                        ->icon('heroicon-o-x-circle')
+                        ->form([
+                            Textarea::make('notes')
+                                ->label('Rejection Note')
+                                ->placeholder('Rejection Message')
+                                ->required() // Bisa dibuat required untuk penolakan
+                        ])
+                        ->action(function (ApprovalRequest $record, array $data) {
+                            $record->reject($data['notes']);
+                        })
+                        ->visible(fn(ApprovalRequest $record): bool => $record->isApprovalPending() && auth()->user()->canApprove($record)),
+                ])->button()->label('Actions')->icon('heroicon-m-ellipsis-horizontal'),
                 EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -313,7 +368,7 @@ class ApprovalRequestResource extends Resource
                     BulkAction::make('exportPDF')
                         ->label('Download PDF')
                         ->icon('heroicon-o-folder-arrow-down')
-                        ->openUrlInNewTab()
+                        ->deselectRecordsAfterCompletion()
                         ->action(fn(Collection $records) => redirect()->away(
                             URL::signedRoute('report.approval', [
                                 'ids' => $records->pluck('id')->toArray()
