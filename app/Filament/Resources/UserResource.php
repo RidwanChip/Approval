@@ -66,6 +66,7 @@ class UserResource extends Resource
                         TextInput::make('email')
                             ->placeholder('example@mail.com')
                             ->email()
+                            ->unique(ignoreRecord: true)
                             ->required()
                             ->maxLength(255),
                         DateTimePicker::make('email_verified_at')->disabled(fn() => !auth()->user()->hasRole('Admin')),
@@ -78,6 +79,7 @@ class UserResource extends Resource
                             ->maxLength(255),
                         Select::make('roles')
                             ->multiple()
+                            ->required()
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->required()
@@ -111,6 +113,21 @@ class UserResource extends Resource
                             ->searchable()
                             ->createOptionForm([
                                 TextInput::make('name')
+                                    ->unique()
+                                    ->maxLength(255)
+                                    ->minLength(2)
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->maxLength(255)
+                                    ->minLength(2),
+                            ])->required()->disabled(fn() => !auth()->user()->hasRole('Admin')),
+                        Select::make('position_id')
+                            ->relationship('position', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->unique()
                                     ->maxLength(255)
                                     ->minLength(2)
                                     ->required(),
@@ -140,6 +157,9 @@ class UserResource extends Resource
                     ->hidden(fn() => !auth()->user()->hasRole('Admin')),
                 TextColumn::make('employee.department.name')
                     ->label('Department')
+                    ->searchable(),
+                TextColumn::make('employee.position.name')
+                    ->label('Position')
                     ->searchable(),
                 TextColumn::make('employee.contact')
                     ->label('Phone Number')

@@ -15,6 +15,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ApprovalFlowResource\Pages;
 use App\Filament\Resources\ApprovalFlowResource\RelationManagers;
@@ -91,14 +92,19 @@ class ApprovalFlowResource extends Resource
                     ->label('Approver')
             ])
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -110,6 +116,11 @@ class ApprovalFlowResource extends Resource
         //     return parent::getEloquentQuery();
         // }
         return parent::getEloquentQuery()->where('user_id', auth()->id());
+
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function getRelations(): array
@@ -124,7 +135,7 @@ class ApprovalFlowResource extends Resource
         return [
             'index' => Pages\ListApprovalFlows::route('/'),
             'create' => Pages\CreateApprovalFlow::route('/create'),
-            'edit' => Pages\EditApprovalFlow::route('/{record}/edit'),
+            // 'edit' => Pages\EditApprovalFlow::route('/{record}/edit'),
         ];
     }
 }

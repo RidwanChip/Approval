@@ -4,26 +4,26 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Position;
 use Filament\Forms\Form;
-use App\Models\Department;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PositionResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\DepartmentResource\Pages;
-use App\Filament\Resources\DepartmentResource\RelationManagers;
+use App\Filament\Resources\PositionResource\RelationManagers;
 
-class DepartmentResource extends Resource
+class PositionResource extends Resource
 {
-    protected static ?string $model = Department::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+    protected static ?string $model = Position::class;
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
 
     protected static ?string $navigationGroup = 'User Settings';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -70,9 +70,7 @@ class DepartmentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultPaginationPageOption(10)
-            ->paginated([10, 25, 50]);
+            ]);
     }
 
     public static function getRelations(): array
@@ -85,9 +83,9 @@ class DepartmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDepartments::route('/'),
-            'create' => Pages\CreateDepartment::route('/create'),
-            'edit' => Pages\EditDepartment::route('/{record}/edit'),
+            'index' => Pages\ListPositions::route('/'),
+            'create' => Pages\CreatePosition::route('/create'),
+            'edit' => Pages\EditPosition::route('/{record}/edit'),
         ];
     }
 }

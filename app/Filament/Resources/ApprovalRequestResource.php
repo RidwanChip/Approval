@@ -225,12 +225,17 @@ class ApprovalRequestResource extends Resource
                     ->label('Step')
                     ->formatStateUsing(
                         fn($state, $record) =>
-                        $record->status === 'approved' ?  "{$state} : " . 'Completed' : ($record->status === 'rejected' ?  "{$state} : " . 'Rejected' : "Step {$state}/" . $record->flow->steps->count())
+                        $record->status === 'approved'
+                            ? "{$state} : Completed"
+                            : ($record->status === 'rejected'
+                                ? "{$state} : Rejected"
+                                : (optional($record->flow)->steps ? "Step {$state}/" . $record->flow->steps->count() : "Deleted")
+                            )
                     )
                     ->badge()
                     ->color(
                         fn($state, $record) =>
-                        $record->status === 'approved' ? 'success' : ($record->status === 'rejected' ? 'danger' : ($state >= $record->flow->steps->count() ? 'success' : 'primary'))
+                        $record->status === 'approved' ? 'success' : ($record->status === 'rejected' ? 'danger' : (optional($record->flow)->steps && $state >= $record->flow->steps->count() ? 'success' : 'primary'))
                     )
                     ->toggleable(),
                 TextColumn::make('logs')

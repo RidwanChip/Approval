@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('approval_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('approval_flow_id')->constrained();
+            $table->foreignId('approval_flow_id');
             $table->string('status')->default('pending');
             $table->integer('current_level')->default(1);
             $table->string('data');

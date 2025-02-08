@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('approval_flow_steps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('approval_flow_id')->constrained()->onDelete('cascade');
+            $table->foreignId('approval_flow_id');
             $table->integer('level');
             $table->foreignId('user_id');
             $table->timestamps();

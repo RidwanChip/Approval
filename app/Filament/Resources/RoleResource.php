@@ -34,6 +34,7 @@ class RoleResource extends Resource
             ->schema([
                 TextInput::make('name')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 TextInput::make('guard_name')
                     ->required()

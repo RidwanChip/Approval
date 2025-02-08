@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\Position;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -27,6 +28,7 @@ class EmployeeSeeder extends Seeder
         $admin = Employee::create([
             'user_id' => $adminUser->id,
             'department_id' => Department::where('name', 'HRD')->first()->id,
+            'position_id' => Position::where('name', 'Staff')->first()->id,
             'contact' => '081234567890'
         ]);
 
@@ -41,6 +43,7 @@ class EmployeeSeeder extends Seeder
                     'password' => Hash::make('password'),
                 ],
                 'department_id' => Department::where('name', 'Produksi')->first()->id,
+                'position_id' => Position::where('name', 'Staff')->first()->id,
                 'contact' => '081234567891',
                 'role' => 'Supervisor'
             ],
@@ -51,8 +54,9 @@ class EmployeeSeeder extends Seeder
                     'password' => Hash::make('password'),
                 ],
                 'department_id' => Department::where('name', 'Produksi')->first()->id,
+                'position_id' => Position::where('name', 'Staff')->first()->id,
                 'contact' => '081234567892',
-                'role' => 'Operator Mesin'
+                'role' => 'Karyawan'
             ]
         ];
 
@@ -66,6 +70,6 @@ class EmployeeSeeder extends Seeder
         }
 
         // Generate random employees
-        Employee::factory()->count(50)->create();
+        // Employee::factory()->count(50)->create();
     }
 }
