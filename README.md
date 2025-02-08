@@ -14,7 +14,7 @@ Ikuti langkah-langkah berikut untuk menginstall dan menjalankan Laravel Approval
 
 ### 1. Clone Repository
 ```sh
-git clone https://github.com/username/laravel-approval.git
+git clone https://github.com/RidwanChip/FMS.git
 cd laravel-approval
 ```
 
