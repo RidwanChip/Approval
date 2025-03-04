@@ -56,7 +56,8 @@ class ApprovalRequestResource extends Resource
                 Hidden::make('user_id')
                     ->default(auth()->id()),
                 Select::make('approval_flow_id')
-                    ->label('Approval Flow')
+                    ->label('Approval Name')
+                    ->hint('Click \'+\' to create a new flow')
                     ->relationship(
                         name: 'flow',
                         titleAttribute: 'name',
@@ -97,8 +98,6 @@ class ApprovalRequestResource extends Resource
                                     })
                                     ->columnStart(1)
                             ])
-                            ->columns(2)
-                            ->columnSpanFull()
                             ->addActionLabel('Add Another Approver')
                             ->defaultItems(1)
                             ->reorderableWithButtons()
@@ -119,13 +118,13 @@ class ApprovalRequestResource extends Resource
                 TextInput::make('data')
                     ->required()
                     ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
-                TextInput::make('description')
+                Textarea::make('description')
                     ->required()
                     ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
                 Section::make('Riwayat Approval')
                     ->schema([
                         Repeater::make('logs')
-                            ->label('Notes')
+                            ->label('List Notes')
                             ->relationship()
                             ->schema([
                                 Grid::make()
@@ -136,18 +135,18 @@ class ApprovalRequestResource extends Resource
                                             ->disabled(),
 
                                         TextInput::make('action')
-                                            ->label('Aksi')
+                                            ->label('Action')
                                             ->formatStateUsing(fn($state) => ucfirst($state))
                                             ->disabled(),
 
                                         TextInput::make('created_at')
-                                            ->label('Waktu')
+                                            ->label('Date Time')
                                             ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->translatedFormat('d F Y, H:i') ?? '-')
                                             ->columnSpan(1)
                                             ->disabled(),
 
                                         Textarea::make('notes')
-                                            ->label('Catatan')
+                                            ->label('Note')
                                             ->columnSpan([
                                                 'sm' => 2,
                                                 'xl' => 3,
@@ -157,6 +156,7 @@ class ApprovalRequestResource extends Resource
                                     ])
 
                             ])
+                            ->itemLabel("Notes")
                             ->defaultItems(0)
                             ->disabled()
                             ->collapsible()
@@ -182,18 +182,21 @@ class ApprovalRequestResource extends Resource
                     ->badge()
                     ->color('primary')
                     ->toggleable(),
+                TextColumn::make('description')
+                    ->limit(50)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Created At')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Reviewed On')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -237,7 +240,7 @@ class ApprovalRequestResource extends Resource
                         fn($state, $record) =>
                         $record->status === 'approved' ? 'success' : ($record->status === 'rejected' ? 'danger' : (optional($record->flow)->steps && $state >= $record->flow->steps->count() ? 'success' : 'primary'))
                     )
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('logs')
                     ->label('Approver')
                     ->formatStateUsing(function ($record) {
@@ -254,8 +257,8 @@ class ApprovalRequestResource extends Resource
                     ->color(function ($record) {
                         $lastLog = $record->logs->last();
                         return match ($lastLog?->action) {
-                                // 'approved' => 'success',
-                                // 'rejected' => 'danger',
+                            // 'approved' => 'success',
+                            // 'rejected' => 'danger',
                             default => 'secondary',
                         };
                     })
