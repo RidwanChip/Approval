@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ApprovalRequest extends Model
 {
+    use LogsActivity;
+
     // Start Relation Group
 
     // Create realtion to user
@@ -86,5 +90,21 @@ class ApprovalRequest extends Model
             // Hapus semua log terlebih dahulu
             $request->logs()->delete();
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'current_level',
+                'status',
+                'user.name',
+                'flow.name'
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('approval_request')
+            ->setDescriptionForEvent(fn(string $eventName) => "Approval request has been {$eventName}")
+            ->logFillable();
     }
 }
