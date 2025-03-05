@@ -92,7 +92,7 @@ class UserResource extends Resource
                                 'xl' => 2,
                             ]),
                         FileUpload::make('signature_image')
-                            ->label('Tanda Tangan')
+                            ->label('Signature Image')
                             ->disk('public') // Tentukan disk untuk penyimpanan (gunakan public disk)
                             ->directory('signatures') // Direktori untuk menyimpan gambar tanda tangan
                             ->image() // Validasi file yang di-upload hanya gambar
@@ -165,7 +165,7 @@ class UserResource extends Resource
                     ->label('Phone Number')
                     ->searchable(),
                 ImageColumn::make('signature_image')
-                    ->label('Tanda Tangan'),
+                    ->label('Signature'),
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('email_verified_at')
