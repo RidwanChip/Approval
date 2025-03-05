@@ -22,10 +22,6 @@ class User extends Authenticatable
             ->logOnly([
                 'name',
                 'email',
-                'email_verified_at',
-                'employee.department.name',
-                'employee.position.name',
-                'employee.contact'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
