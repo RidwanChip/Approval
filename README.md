@@ -8,6 +8,7 @@ Laravel Approval adalah sistem berbasis Laravel yang digunakan untuk proses pers
 - ✅ Manajemen pengguna dan peran (role-based access control)
 - ✅ Pembuatan dan pengelolaan permohonan approval
 - ✅ Proses persetujuan dengan berbagai status (pending, approved, rejected)
+- ✅ Log Activity Users
 
 ## 🚀 Instalasi
 Ikuti langkah-langkah berikut untuk menginstall dan menjalankan Laravel Approval di lingkungan lokal.
