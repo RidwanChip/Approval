@@ -33,7 +33,7 @@ class ApprovalLog extends Model
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('approval_log')
+            ->useLogName('approval log')
             ->setDescriptionForEvent(fn(string $eventName) => "Approval log has been {$eventName}")
             ->logFillable();
     }
