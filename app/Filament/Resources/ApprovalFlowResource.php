@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ApprovalFlowResource\Pages;
 use App\Filament\Resources\ApprovalFlowResource\RelationManagers;
 
+
 class ApprovalFlowResource extends Resource
 {
     protected static ?string $model = ApprovalFlow::class;
@@ -27,6 +28,8 @@ class ApprovalFlowResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
 
     protected static ?string $navigationGroup = 'Approvals';
+
+    protected static ?string $navigationLabel = 'Approvals';
 
     public static function getNavigationBadge(): ?string
     {
@@ -42,7 +45,6 @@ class ApprovalFlowResource extends Resource
                     ->label('Approval Name'),
                 Hidden::make('user_id')
                     ->default(auth()->id()),
-
                 Repeater::make('steps')
                     ->relationship()
                     ->required()
@@ -68,8 +70,8 @@ class ApprovalFlowResource extends Resource
                             })
                             ->columnStart(1)
                     ])
-                    ->columns(2)
-                    ->columnSpanFull()
+                    // ->columns(2)
+                    // ->columnSpanFull()
                     ->addActionLabel('Add Another Approver')
                     ->defaultItems(1)
                     ->reorderableWithButtons()
