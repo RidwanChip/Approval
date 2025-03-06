@@ -20,7 +20,8 @@ class Employee extends Model
             ->useLogName('profile')
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "User has been {$eventName}");
+            ->setDescriptionForEvent(fn(string $eventName) => "User has been {$eventName}")
+            ->logFillable();
     }
 
     public function user(): BelongsTo
