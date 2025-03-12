@@ -23,19 +23,12 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
         ]);
 
-        // Create Test user
-        $testUser = User::factory()->create([
-            'name' => 'Test',
-            'email' => 'test@example.com',
-        ]);
-
         // Get existing roles
         $roleAdmin = Role::findByName('Admin');
         $roleKaryawan = Role::findByName('Karyawan');
 
         // Assign roles
         $user->assignRole($roleAdmin);
-        $testUser->assignRole($roleKaryawan);
 
         // Create 100 fake users
         // User::factory()
