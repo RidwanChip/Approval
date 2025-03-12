@@ -16,7 +16,7 @@ Ikuti langkah-langkah berikut untuk menginstall dan menjalankan Laravel Approval
 ### 1. Clone Repository
 ```sh
 git clone https://github.com/RidwanChip/FMS.git
-cd FMS
+cd Approval
 ```
 
 ### 2. Install Dependensi
