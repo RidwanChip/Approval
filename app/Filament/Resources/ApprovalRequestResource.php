@@ -57,7 +57,7 @@ class ApprovalRequestResource extends Resource
                     ->default(auth()->id()),
                 Select::make('approval_flow_id')
                     ->label('Approval Name')
-                    ->hint('Click \'+\' to create a new flow')
+                    ->placeholder('Select an option or Click \'+\' to create a new flow')
                     ->relationship(
                         name: 'flow',
                         titleAttribute: 'name',
@@ -121,7 +121,7 @@ class ApprovalRequestResource extends Resource
                 Textarea::make('description')
                     ->required()
                     ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
-                Section::make('Riwayat Approval')
+                Section::make('Note History')
                     ->schema([
                         Repeater::make('logs')
                             ->label('List Notes')
@@ -172,7 +172,7 @@ class ApprovalRequestResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Name')
+                    ->label('Requestor')
                     ->weight(FontWeight::Bold)
                     ->searchable()
                     ->sortable()
@@ -183,16 +183,17 @@ class ApprovalRequestResource extends Resource
                     ->color('primary')
                     ->toggleable(),
                 TextColumn::make('description')
+                    ->label('Description')
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label('Submitted At')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label('Reviewed On')
+                    ->label('Last Updated')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable()
@@ -202,9 +203,9 @@ class ApprovalRequestResource extends Resource
                     ->badge()
                     ->searchable()
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending' => 'Waiting for approval',
+                        'pending' => 'Pending Approval',
                         'approved' => 'Approved',
-                        'onHold' => 'Action Needed',
+                        'onHold' => 'On Hold',
                         'rejected' => 'Rejected',
                         default => $state,
                     })
@@ -242,7 +243,7 @@ class ApprovalRequestResource extends Resource
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('logs')
-                    ->label('Approver')
+                    ->label('Reviewers')
                     ->formatStateUsing(function ($record) {
                         $approvers = $record->logs
                             ->whereIn('action', ['approved', 'rejected'])

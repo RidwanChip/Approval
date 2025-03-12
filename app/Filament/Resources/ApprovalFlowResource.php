@@ -42,7 +42,8 @@ class ApprovalFlowResource extends Resource
             ->schema([
                 TextInput::make('name')
                     ->required()
-                    ->label('Approval Name'),
+                    ->label('Flow Name')
+                    ->placeholder('Enter flow name'),
                 Hidden::make('user_id')
                     ->default(auth()->id()),
                 Repeater::make('steps')

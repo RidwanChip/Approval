@@ -25,7 +25,7 @@ class ReportController extends Controller
         $userName = preg_replace('/[^A-Za-z0-9_\-]/', '', $userName);
 
         // Format nama file dengan nama user
-        $fileName = "Laporan-Approval_{$userName}_{$tanggal}.pdf";
+        $fileName = "Approval-report_{$userName}_{$tanggal}.pdf";
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf.approval_report', compact('approvals'));

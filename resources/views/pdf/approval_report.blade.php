@@ -5,80 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Laporan Approval</title>
+    <title>Approval Report</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
         }
 
-        table {
+        .report-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
-        th,
-        td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+        .info-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
         }
 
-        th {
-            background-color: #f2f2f2;
+        .info-label {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            width: 30%;
+        }
+
+        .approval-details {
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        .signature-section {
+            margin-top: 30px;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .signature-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .signature-image {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
         }
 
         .page-break {
             page-break-after: always;
         }
 
-        .signature {
-            width: 100%;
-            height: 20%;
-        }
-
-        table,
-        th,
-        td {
-            width: 100%;
-            text-align: center;
-            border: 1px solid black;
-            border-collapse: collapse;
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <h2>Laporan Approval</h2>
+    <h2 class="report-title">Approval Report</h2>
 
     @foreach ($approvals as $approval)
-        <table border="1">
+        <table class="info-table">
             <tr>
-                <td>Approval ID: {{ $approval->id }}</td>
-                <td>Nama Pemohon: {{ $approval->user->name }}</td>
+                <td class="info-label">Document Number</td>
+                <td>{{ $approval->id }}</td>
+                <td class="info-label">Requestor</td>
+                <td>{{ $approval->user->name }}</td>
             </tr>
         </table>
-        <p>Status: {{ $approval->status }}</p>
-        <p>Data: {{ $approval->data }}</p>
-        <p>Description: {{ $approval->description }}</p>
 
-        <div>
-            <p>Tanggal Persetujuan: {{ $approval->created_at->format('d-m-Y') }}</p>
-            <h4>Daftar Approver:</h4>
-            <!-- Tampilkan Tanda Tangan Approver -->
-            <table class="signature">
+        <div class="approval-details">
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Document Type</td>
+                    <td>{{ $approval->flow->name }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Status</td>
+                    <td>{{ ucfirst($approval->status) }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Request For</td>
+                    <td>{{ $approval->data }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Description</td>
+                    <td>{{ $approval->description }}</td>
+                </tr>
+                <tr>
+                    <td class="info-label">Submission Date</td>
+                    <td>{{ $approval->created_at->format('d F Y') }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="signature-section">
+            <h4>Approval Signatures</h4>
+            <table class="signature-table">
                 <tr>
                     @foreach ($approval->logs as $log)
                         @if (in_array($log->action, ['approved', 'rejected']))
                             <td>
                                 @if ($log->user->signature_image)
-                                    <img class="signature"
+                                    <img class="signature-image"
                                         src="{{ realpath(public_path('storage/' . $log->user->signature_image)) }}"
-                                        alt="Signature" style="width: 100px; height: 100px; ">
+                                        alt="Signature">
                                 @else
-                                    <p>-</p>
+                                    <p></p>
                                 @endif
-
                             </td>
                         @endif
                     @endforeach
@@ -86,8 +136,10 @@
                 <tr>
                     @foreach ($approval->logs as $log)
                         @if (in_array($log->action, ['approved', 'rejected']))
-                            <td> {{ ucfirst($log->user->name) }} - {{ $log->user->getRoleNames()->first() }}
-                                {{-- {{ $log->created_at->format('H:i, d F Y') }}</td> --}}
+                            <td>
+                                {{ ucfirst($log->user->name) }}<br>
+                                <small>{{ ucfirst($log->user->employee->position->name ?? 'No Position') }}</small>
+                            </td>
                         @endif
                     @endforeach
                 </tr>
@@ -95,6 +147,6 @@
         </div>
         <div class="page-break"></div>
     @endforeach
-
 </body>
+
 </html>
