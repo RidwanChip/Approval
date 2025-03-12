@@ -17,22 +17,32 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create Admin user
         $user = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
         ]);
 
+        // Create Test user
         $testUser = User::factory()->create([
             'name' => 'Test',
             'email' => 'test@example.com',
         ]);
 
-        // Buat role Admin dan Penulis
-        $roleAdmin = Role::create(['name' => 'Admin']);
-        $roleKaryawan = Role::create(['name' => 'Karyawan']);
+        // Get existing roles
+        $roleAdmin = Role::findByName('Admin');
+        $roleKaryawan = Role::findByName('Karyawan');
 
-        // Assign role ke user
+        // Assign roles
         $user->assignRole($roleAdmin);
         $testUser->assignRole($roleKaryawan);
+
+        // Create 100 fake users
+        // User::factory()
+        //     ->count(100)
+        //     ->create()
+        //     ->each(function ($user) use ($roleKaryawan) {
+        //         $user->assignRole($roleKaryawan);
+        //     });
     }
 }

@@ -18,23 +18,18 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin User
-        $adminUser = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-        ]);
+        // Get existing Admin User
+        $adminUser = User::where('email', 'admin@example.com')->first();
 
+        // Create Admin Employee record
         $admin = Employee::create([
             'user_id' => $adminUser->id,
             'department_id' => Department::where('name', 'HRD')->first()->id,
-            'position_id' => Position::where('name', 'Staff')->first()->id,
+            'position_id' => Position::where('name', 'HR Manager')->first()->id,
             'contact' => '081234567890'
         ]);
 
-        $adminUser->assignRole('Admin');
-
-        //Create Sample Employees
+        // Rest of the employees creation
         $employees = [
             [
                 'user' => [

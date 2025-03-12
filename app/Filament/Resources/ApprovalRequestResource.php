@@ -67,6 +67,13 @@ class ApprovalRequestResource extends Resource
                     ->native(false)
                     ->searchable()
                     ->preload()
+                    ->disabled(
+                        fn($record) =>
+                        $record && (
+                            in_array($record->status, ['approved', 'rejected']) ||
+                            $record->user_id !== auth()->id()
+                        )
+                    )
                     ->createOptionForm([
                         TextInput::make('name')
                             ->required()
@@ -117,10 +124,22 @@ class ApprovalRequestResource extends Resource
                 // ->disabled(fn($record) => $record && auth()->user()->canApprove($record)),
                 TextInput::make('data')
                     ->required()
-                    ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
+                    ->disabled(
+                        fn($record) =>
+                        $record && (
+                            in_array($record->status, ['approved', 'rejected']) ||
+                            $record->user_id !== auth()->id()
+                        )
+                    ),
                 Textarea::make('description')
                     ->required()
-                    ->disabled(fn($record) => $record && $record->user_id !== auth()->id()),
+                    ->disabled(
+                        fn($record) =>
+                        $record && (
+                            in_array($record->status, ['approved', 'rejected']) ||
+                            $record->user_id !== auth()->id()
+                        )
+                    ),
                 Section::make('Note History')
                     ->schema([
                         Repeater::make('logs')
@@ -184,7 +203,7 @@ class ApprovalRequestResource extends Resource
                     ->toggleable(),
                 TextColumn::make('description')
                     ->label('Description')
-                    ->limit(50)
+                    ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Submitted At')
