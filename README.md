@@ -2,7 +2,7 @@
 
 ![Laravel Approval](https://img.shields.io/badge/Laravel-11-red.svg)
 
-Laravel Approval adalah sistem berbasis Laravel yang digunakan untuk proses persetujuan atau approval dalam suatu workflow. Aplikasi ini memungkinkan pengguna untuk mengajukan permohonan dan mendapatkan persetujuan berdasarkan aturan yang telah ditentukan.
+Laravel Approval adalah sistem berbasis Laravel yang digunakan untuk proses persetujuan atau approval dalam suatu workflow / berjenjang. Aplikasi ini memungkinkan pengguna untuk mengajukan permohonan dan mendapatkan persetujuan berdasarkan aturan yang telah ditentukan.
 
 ## 📌 Fitur Utama
 - ✅ Manajemen pengguna dan peran (role-based access control)
