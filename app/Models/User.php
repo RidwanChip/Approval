@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Panel;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -86,5 +87,9 @@ class User extends Authenticatable
         }
 
         return $currentStep && $currentStep->user_id === $this->id;
+    }
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->hasRole(['Admin']);
     }
 }
